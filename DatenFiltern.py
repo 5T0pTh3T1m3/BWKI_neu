@@ -1,4 +1,5 @@
 import json
+import os
 import sys
 from pprint import pprint
 from bs4 import BeautifulSoup
@@ -15,13 +16,14 @@ def stunde_runden(unixinput):
     return 3600000 * (unixinput // 3600000)
 
 
-def get_preisdaten(pro_id):
+def get_preisdaten(file_path, withchipset, withwattage):
+    extra = None  # eventuelle extra Daten zu dem Produkt (GPU Chipsatz/Netzteil Leistung)
     daten = {}
     '''
     Dateistruktur:
     Dictionary, Key = Zeitpunkt in Unixtime (Sekunden) -> darin ist Liste  Preis zu dem jeweiligen Zeitpunkt und dem jeweiligen Shoplabel
     '''
-    file = open('testdaten.txt', encoding='UTF-8').read()
+    file = open(file_path, encoding='UTF-8').read()
     Soup = BeautifulSoup(file, "html.parser")
 
     # gibt mehrere Male Script in dem HTML-DOc, das letzte enthält das gewollte Script hierfür mit den Daten
@@ -40,7 +42,22 @@ def get_preisdaten(pro_id):
         wanted += element + ' '
     # jetzt ist in Wanted nurnoch die Zeile mit der Variable für die Preisdaten
     preisdaten = json.loads(wanted)
-    # preisdaten = testdaten.copy()
+    if len(preisdaten) == 0:
+        return None
+
+    if withchipset:
+        chipset = Soup.find_all('h2')
+        for result in chipset:
+            if 'Chipset' in result.text:
+                extra = result.text.split(': ')[1]
+                break
+
+    if withwattage:
+        chipset = Soup.find_all('p')
+        for result in chipset:
+            if 'W' in result.text:
+                extra = result.text.strip()
+                break
     '''
     Dateistruktur:
     Liste, in dieser sind die Preisdaten der einzelnen Shops vorhanden
@@ -52,8 +69,6 @@ def get_preisdaten(pro_id):
     [zeit in unixtime (Millisekunden), Preis (Cent, wenn nicht verfügbar -> None)]
     '''
 
-    print(stunde_runden(min([shop['data'][0][0] for shop in preisdaten])), stunde_runden(max([shop['data'][-1][0] for shop in preisdaten])))
-    pprint(preisdaten)
     # alle Daten auf einen Tag genau runden
     for zeitpunkt in range(stunde_runden(min([shop['data'][0][0] for shop in preisdaten])), stunde_runden(max([shop['data'][-1][0] for shop in preisdaten])), 3600000):
         # niedrigsten Preis zu diesem Zeitpunkt herausfinden
@@ -77,15 +92,13 @@ def get_preisdaten(pro_id):
                 if minpreis[0] > shop[0]:
                     minpreis = shop.copy()
         daten.update({zeitpunkt: minpreis})
-
-    return daten
-
-
-def visualize_data(data):
-    pyplot.plot([i//3600000 for i in data.keys()], [data[i][0] for i in data.keys()])
-    pyplot.show()
+    return [daten, extra]
 
 
-DATA = get_preisdaten('qwerty')
-pprint(DATA)
-visualize_data(DATA)
+def filter_preisdaten(source_file, dest_file, GPU, PSU):
+    data = get_preisdaten(source_file, GPU, PSU)
+    open(dest_file, 'w').write(json.dumps(data))
+
+
+for datei in os.listdir():
+    filter_preisdaten(datei, 'gefiltert.json', False, True)
