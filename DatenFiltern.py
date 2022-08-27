@@ -97,8 +97,24 @@ def get_preisdaten(file_path, withchipset, withwattage):
 
 def filter_preisdaten(source_file, dest_file, GPU, PSU):
     data = get_preisdaten(source_file, GPU, PSU)
-    open(dest_file, 'w').write(json.dumps(data))
+    if data is not None:
+        open(dest_file, 'w').write(json.dumps(data))
+
+begin = time.time()
 
 
-for datei in os.listdir():
-    filter_preisdaten(datei, 'gefiltert.json', False, True)
+counter = 0
+files = os.listdir('/Volumes/Hannes_USB/Daten BWKI/PSU/')
+for counter in range(0, len(files)):
+    datei = files[counter]
+    if datei[0] == '.':
+        datei = datei[2:]
+    try:
+        filter_preisdaten('/Volumes/Hannes_USB/Daten BWKI/PSU/' + datei, '/Volumes/Hannes_USB/Gefiltert/PSU/' + datei.split('.')[0] + '.json', False, True)
+    except:
+        print('-------------------------------------------------------\n', datei, '\n----------------------------------------')
+    if counter % 20 == 1:
+        print('Zeit pro Datei', (time.time()-begin)/counter)
+        print('geschätzte Prognose', ((time.time()-begin)/counter)*(len(os.listdir('/Volumes/Hannes_USB/Daten BWKI/PSU/'))-counter)/60)
+
+print(time.time()-begin)
