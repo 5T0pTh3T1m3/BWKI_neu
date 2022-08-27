@@ -11,8 +11,8 @@ testdaten = [{'data': [[34, 1329], [113, 328], [132, 775], [188, 287], [192, 234
              {'data': [[42, 206], [90, 1192], [134, 739], [175, 926], [187, 1842]], 'label': 'shop'}]
 
 
-def tag_runden(unixinput):
-    return 86400 * (unixinput // 86400000)
+def stunde_runden(unixinput):
+    return 3600000 * (unixinput // 3600000)
 
 
 def get_preisdaten(pro_id):
@@ -52,37 +52,28 @@ def get_preisdaten(pro_id):
     [zeit in unixtime (Millisekunden), Preis (Cent, wenn nicht verfügbar -> None)]
     '''
 
-    print(tag_runden(min([shop['data'][1] for shop in preisdaten])[0]),
-          tag_runden(max([shop['data'][1] for shop in preisdaten])[0]))
+    print(stunde_runden(min([shop['data'][0][0] for shop in preisdaten])), stunde_runden(max([shop['data'][-1][0] for shop in preisdaten])))
+    pprint(preisdaten)
     # alle Daten auf einen Tag genau runden
-    for zeitpunkt in range(tag_runden(min([shop['data'][1] for shop in preisdaten])[0]),
-                           tag_runden(max([shop['data'][1] for shop in preisdaten])[0]), 86400):
+    for zeitpunkt in range(stunde_runden(min([shop['data'][0][0] for shop in preisdaten])), stunde_runden(max([shop['data'][-1][0] for shop in preisdaten])), 3600000):
         # niedrigsten Preis zu diesem Zeitpunkt herausfinden
         preis = []  # enthält alle Shops mit den jeweligen Preisen, danach wird der mit dem Minimum ermittelt
         for shop in preisdaten:
-            added = False
-            for datensatz in shop['data']:
-                if tag_runden(datensatz[0]) == zeitpunkt:
+            for datensatz in reversed(shop['data']):
+                if stunde_runden(datensatz[0]) <= zeitpunkt + 3600000:
                     preis.append([datensatz[1], shop['label']])
-                    added = True
                     break
 
-            if not added:
-                for datensatz in reversed(shop['data']):
-                    if tag_runden(datensatz[0]) < zeitpunkt:
-                        preis.append([datensatz[1], shop['label']])
-                        break
-
         if len(daten.keys()) != 0:
-            minpreis = [daten[zeitpunkt - 86400][0], daten[zeitpunkt - 86400][1]]
+            minpreis = [daten[zeitpunkt - 3600000][0], daten[zeitpunkt - 3600000][1]]
         else:
             minpreis = [None, None]
         for shop in preis:
-            if shop[0] is None and minpreis[0] is not None and minpreis[1] is shop[1]:
-                minpreis[0] = None
-            elif minpreis[0] is None and shop[0] is not None:
+            if minpreis[1] is shop[1]:  # wie sich der bisher günstigste Shop entwickelt hat
                 minpreis = shop.copy()
-            elif minpreis[0] is not None and shop[0] is not None:
+            elif minpreis[0] is None and shop[0] is not None:  # wenn es jetzt verfügbar ist vorher aber nicht war
+                minpreis = shop.copy()
+            elif minpreis[0] is not None and shop[0] is not None:  # ob es jetzt einen günstigeren Shop gibt
                 if minpreis[0] > shop[0]:
                     minpreis = shop.copy()
         daten.update({zeitpunkt: minpreis})
@@ -91,10 +82,10 @@ def get_preisdaten(pro_id):
 
 
 def visualize_data(data):
-    pyplot.plot([i for i in data.keys()], [data[i][0] for i in data.keys()])
+    pyplot.plot([i//3600000 for i in data.keys()], [data[i][0] for i in data.keys()])
     pyplot.show()
 
 
-DATA = get_preisdaten('asdasd')
-visualize_data(DATA)
+DATA = get_preisdaten('qwerty')
 pprint(DATA)
+visualize_data(DATA)
