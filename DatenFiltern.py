@@ -55,7 +55,7 @@ def get_preisdaten(file_path, withchipset, withwattage):
     if withwattage:
         chipset = Soup.find_all('p')
         for result in chipset:
-            if 'W' in result.text:
+            if ' W' in result.text:
                 extra = result.text.strip()
                 break
     '''
