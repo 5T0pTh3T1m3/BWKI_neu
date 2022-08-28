@@ -8,9 +8,6 @@ import random
 import time
 from matplotlib import pyplot
 
-testdaten = [{'data': [[34, 1329], [113, 328], [132, 775], [188, 287], [192, 234]], 'label': 'shop'},
-             {'data': [[42, 206], [90, 1192], [134, 739], [175, 926], [187, 1842]], 'label': 'shop'}]
-
 
 def stunde_runden(unixinput):
     return 3600000 * (unixinput // 3600000)
@@ -100,9 +97,8 @@ def filter_preisdaten(source_file, dest_file, GPU, PSU):
     if data is not None:
         open(dest_file, 'w').write(json.dumps(data))
 
+
 begin = time.time()
-
-
 counter = 0
 files = os.listdir('/Volumes/Hannes_USB/Daten BWKI/PSU/')
 for counter in range(0, len(files)):
