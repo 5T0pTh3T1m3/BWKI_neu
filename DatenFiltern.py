@@ -100,17 +100,17 @@ def filter_preisdaten(source_file, dest_file, GPU, PSU):
 
 begin = time.time()
 counter = 0
-files = os.listdir('/Volumes/Hannes_USB/Daten BWKI/PSU/')
+files = os.listdir('D:/Preisdaten/PSU/')
 for counter in range(0, len(files)):
     datei = files[counter]
     if datei[0] == '.':
         datei = datei[2:]
     try:
-        filter_preisdaten('/Volumes/Hannes_USB/Daten BWKI/PSU/' + datei, '/Volumes/Hannes_USB/Gefiltert/PSU/' + datei.split('.')[0] + '.json', False, True)
+        filter_preisdaten('D:/Preisdaten/PSU/' + datei, 'D:/Gefiltert/PSU_neu/' + datei.split('.')[0] + '.json', False, True)
     except:
         print('-------------------------------------------------------\n', datei, '\n----------------------------------------')
     if counter % 20 == 1:
         print('Zeit pro Datei', (time.time()-begin)/counter)
-        print('geschätzte Prognose', ((time.time()-begin)/counter)*(len(os.listdir('/Volumes/Hannes_USB/Daten BWKI/PSU/'))-counter)/60)
+        print('geschätzte Prognose', ((time.time()-begin)/counter)*(len(os.listdir('D:/Preisdaten/PSU/'))-counter)/60)
 
 print(time.time()-begin)
