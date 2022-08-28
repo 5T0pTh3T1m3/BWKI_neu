@@ -6,12 +6,13 @@ from pprint import pprint
 GPU = False
 PSU = True
 categories = {}
+data = {}
 
 if PSU:
     # 50 bis 1600 Watt sind möglich (32 * 50)
     for i in range(1, 33):
         categories.update({i * 50: []})
-
+        data.update({i * 50: {}})
 path = 'Gefiltert/PSU/'
 
 
@@ -30,6 +31,10 @@ for file in os.listdir(path):
                     print('Problem bei: ' + file + f'!\n{data[1][0]} ist kein Integer!')
             else:
                 print('WRONG FORMAT IN FILE: ' + file)
+
+            for wattage in categories.keys():
+
+
 
 for key in categories.keys():
     print(key, categories[key])
