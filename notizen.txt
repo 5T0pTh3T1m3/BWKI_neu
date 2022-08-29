@@ -1,2 +1,28 @@
 1651237200000
 1661601600000
+
+            for cat in categories.keys():
+                if len(categories[cat]) != 0:
+                    preisverlauf = {}
+                    '''
+                    preisverlauf Datenstruktur:
+                    preisverlauf[zeitpunkt] = preis
+
+                    product Datenstruktur:
+                    liste[dateiname, dateiinhalt]
+                        dateiinhalt:
+                        liste[dict {preisdaten}, categorie]
+                            preisdaten:
+                                list[zeitpunkt] = [preis, shop]
+                    '''
+                    for product in categories[cat]:
+                        for zeitpunkt in product[1][0].keys():
+                            if zeitpunkt in preisverlauf.keys():  # Zeitpunkt ist bereits vorhanden
+                                if preisverlauf[zeitpunkt] is None:  # war in dem Moment nicht verfügbar
+                                    preisverlauf[zeitpunkt] = product[1][0][zeitpunkt][0]
+                                elif product[1][0][zeitpunkt][0] is not None:
+                                    if preisverlauf[zeitpunkt] > product[1][0][zeitpunkt][0]:  # war in dem Moment vorhanden, aber teurer
+                                        preisverlauf[zeitpunkt] = product[1][0][zeitpunkt][0]
+                            else:
+                                preisverlauf.update({zeitpunkt: product[1][0][zeitpunkt][0]})
+                    DATA.update({cat: preisverlauf})
