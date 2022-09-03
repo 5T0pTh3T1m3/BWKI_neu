@@ -109,6 +109,7 @@ def mp_filtering(eingabe):
             try:
                 filter_preisdaten(eingabe[0] + files[i], eingabe[1] + files[i].split('.')[0] + '.json', eingabe[2], eingabe[3])
             except:
+                print(files[i])
                 try:
                     open('neuFiltern/' + str(eingabe[5]), 'a').write(files[i] + '\n')
                 except FileNotFoundError:
@@ -139,11 +140,11 @@ if __name__ == '__main__':
     source = 'C:/Users/PC/Daten/daten/Code/BWKI/daten/Preisdaten/GPU/'
     destination = 'neuFiltern/GPU/'
     NumberOfProcesses = 12
-    Numbers = [0 for i in range(NumberOfProcesses)]  # die Indexe der Aufgaben für jeden Prozess
+    Numbers = [[] for i in range(NumberOfProcesses)]  # die Indexe der Aufgaben für jeden Prozess
     for i in range(len(os.listdir(source))):
-        Numbers[i % NumberOfProcesses] += 1
+        Numbers[i % NumberOfProcesses].append(i)
 
-    data = [[source, destination, True, False, range(i, i + Numbers[i]), i] for i in range(NumberOfProcesses)]
+    data = [[source, destination, True, False, Numbers[i], i].copy() for i in range(NumberOfProcesses)]
     p.map(mp_filtering, data)
 
     p.close()
