@@ -7,6 +7,8 @@ import datetime
 import random
 import time
 from matplotlib import pyplot
+from multiprocessing import Pool
+from functools import partial
 
 
 def stunde_runden(unixinput):
@@ -98,19 +100,51 @@ def filter_preisdaten(source_file, dest_file, GPU, PSU):
         open(dest_file, 'w').write(json.dumps(data))
 
 
-begin = time.time()
-counter = 0
-files = os.listdir('D:/Preisdaten/PSU/')
-for counter in range(0, len(files)):
-    datei = files[counter]
-    if datei[0] == '.':
-        datei = datei[2:]
-    try:
-        filter_preisdaten('D:/Preisdaten/PSU/' + datei, 'D:/Gefiltert/PSU_neu/' + datei.split('.')[0] + '.json', False, True)
-    except:
-        print('-------------------------------------------------------\n', datei, '\n----------------------------------------')
-    if counter % 20 == 1:
-        print('Zeit pro Datei', (time.time()-begin)/counter)
-        print('geschätzte Prognose', ((time.time()-begin)/counter)*(len(os.listdir('D:/Preisdaten/PSU/'))-counter)/60)
+# eingabe = [source_path, destination_path, GPU, PSU, filerange, processindex]
+# filtert die Dateien in einem bestimmten Bereich
+def mp_filtering(eingabe):
+    files = sorted(os.listdir(eingabe[0]))
+    for i in eingabe[4]:
+        if i < len(files):
+            try:
+                filter_preisdaten(eingabe[0] + files[i], eingabe[1] + files[i].split('.')[0] + '.json', eingabe[2], eingabe[3])
+            except:
+                try:
+                    open('neuFiltern/' + str(eingabe[5]), 'a').write(files[i] + '\n')
+                except FileNotFoundError:
+                    open('neuFiltern/' + str(eingabe[5]), 'w').write(files[i] + '\n')
 
-print(time.time()-begin)
+
+if False:
+    begin = time.time()
+    counter = 0
+    files = os.listdir('D:/Preisdaten/PSU/')
+    for counter in range(0, len(files)):
+        datei = files[counter]
+        if datei[0] == '.':
+            datei = datei[2:]
+        try:
+            filter_preisdaten('D:/Preisdaten/PSU/' + datei, 'D:/Gefiltert/PSU_neu/' + datei.split('.')[0] + '.json', False, True)
+        except:
+            print('-------------------------------------------------------\n', datei, '\n----------------------------------------')
+        if counter % 20 == 1:
+            print('Zeit pro Datei', (time.time()-begin)/counter)
+            print('geschätzte Prognose', ((time.time()-begin)/counter)*(len(os.listdir('D:/Preisdaten/PSU/'))-counter)/60)
+
+        print(time.time()-begin)
+
+
+if __name__ == '__main__':
+    p = Pool()
+    source = 'C:/Users/PC/Daten/daten/Code/BWKI/daten/Preisdaten/GPU/'
+    destination = 'neuFiltern/GPU/'
+    NumberOfProcesses = 12
+    Numbers = [0 for i in range(NumberOfProcesses)]  # die Indexe der Aufgaben für jeden Prozess
+    for i in range(len(os.listdir(source))):
+        Numbers[i % NumberOfProcesses] += 1
+
+    data = [[source, destination, True, False, range(i, i + Numbers[i]), i] for i in range(NumberOfProcesses)]
+    p.map(mp_filtering, data)
+
+    p.close()
+    p.join()
