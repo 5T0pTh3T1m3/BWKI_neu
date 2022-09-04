@@ -15,7 +15,7 @@ def stunde_runden(unixinput):
     return 3600000 * (unixinput // 3600000)
 
 
-def get_preisdaten(file_path, withchipset, withwattage):
+def get_preisdaten(file_path, withchipset, withwattage, cpu):
     extra = None  # eventuelle extra Daten zu dem Produkt (GPU Chipsatz/Netzteil Leistung)
     daten = {}
     '''
@@ -25,7 +25,7 @@ def get_preisdaten(file_path, withchipset, withwattage):
     file = open(file_path, encoding='UTF-8').read()
     Soup = BeautifulSoup(file, "html.parser")
 
-    # gibt mehrere Male Script in dem HTML-DOc, das letzte enthält das gewollte Script hierfür mit den Daten
+    # gibt mehrere Male Script in dem HTML-DOC, das letzte enthält das gewollte Script mit den Daten
     wanted = Soup.find_all('script')[-1].text
 
     # nach allen einzelnen Befehlen von JS Splitten + den mit den Preisdaten raussuchen
@@ -57,6 +57,10 @@ def get_preisdaten(file_path, withchipset, withwattage):
             if ' W' in result.text:
                 extra = result.text.strip()
                 break
+
+    if cpu:
+        chip = Soup.find('h1')
+        extra = chip.text
     '''
     Dateistruktur:
     Liste, in dieser sind die Preisdaten der einzelnen Shops vorhanden
@@ -94,20 +98,20 @@ def get_preisdaten(file_path, withchipset, withwattage):
     return [daten, extra]
 
 
-def filter_preisdaten(source_file, dest_file, GPU, PSU):
-    data = get_preisdaten(source_file, GPU, PSU)
+def filter_preisdaten(source_file, dest_file, GPU, PSU, cpu):
+    data = get_preisdaten(source_file, GPU, PSU, cpu)
     if data is not None:
         open(dest_file, 'w').write(json.dumps(data))
 
 
-# eingabe = [source_path, destination_path, GPU, PSU, filerange, processindex]
+# eingabe = [source_path, destination_path, GPU, PSU, filerange, processindex, cpu]
 # filtert die Dateien in einem bestimmten Bereich
 def mp_filtering(eingabe):
     files = sorted(os.listdir(eingabe[0]))
     for i in eingabe[4]:
         if i < len(files):
             try:
-                filter_preisdaten(eingabe[0] + files[i], eingabe[1] + files[i].split('.')[0] + '.json', eingabe[2], eingabe[3])
+                filter_preisdaten(eingabe[0] + files[i], eingabe[1] + files[i].split('.')[0] + '.json', eingabe[2], eingabe[3], eingabe[-1])
             except:
                 print(files[i])
                 try:
@@ -144,7 +148,7 @@ if __name__ == '__main__':
     for i in range(len(os.listdir(source))):
         Numbers[i % NumberOfProcesses].append(i)
 
-    data = [[source, destination, False, False, Numbers[i], i].copy() for i in range(NumberOfProcesses)]
+    data = [[source, destination, False, False, Numbers[i], i, True].copy() for i in range(NumberOfProcesses)]
     p.map(mp_filtering, data)
 
     p.close()
