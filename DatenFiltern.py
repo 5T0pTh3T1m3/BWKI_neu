@@ -137,14 +137,14 @@ if False:
 
 if __name__ == '__main__':
     p = Pool()
-    source = 'C:/Users/PC/Daten/daten/Code/BWKI/daten/Preisdaten/GPU/'
-    destination = 'neuFiltern/GPU/'
+    source = 'C:/Users/PC/Daten/daten/Code/BWKI/daten/Preisdaten/CPU/'
+    destination = 'neuFiltern/CPU/'
     NumberOfProcesses = 12
     Numbers = [[] for i in range(NumberOfProcesses)]  # die Indexe der Aufgaben für jeden Prozess
     for i in range(len(os.listdir(source))):
         Numbers[i % NumberOfProcesses].append(i)
 
-    data = [[source, destination, True, False, Numbers[i], i].copy() for i in range(NumberOfProcesses)]
+    data = [[source, destination, False, False, Numbers[i], i].copy() for i in range(NumberOfProcesses)]
     p.map(mp_filtering, data)
 
     p.close()
