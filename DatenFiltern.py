@@ -15,7 +15,7 @@ def stunde_runden(unixinput):
     return 3600000 * (unixinput // 3600000)
 
 
-def get_preisdaten(file_path, withchipset, withwattage, cpu):
+def get_preisdaten(file_path, prodtype):
     extra = None  # eventuelle extra Daten zu dem Produkt (GPU Chipsatz/Netzteil Leistung)
     daten = {}
     '''
@@ -44,21 +44,21 @@ def get_preisdaten(file_path, withchipset, withwattage, cpu):
     if len(preisdaten) == 0:
         return None
 
-    if withchipset:
+    if prodtype == 'GPU':
         chipset = Soup.find_all('h2')
         for result in chipset:
             if 'Chipset' in result.text:
                 extra = result.text.split(': ')[-1]
                 break
 
-    if withwattage:
+    if prodtype == 'PSU':
         chipset = Soup.find_all('p')
         for result in chipset:
             if ' W' in result.text:
                 extra = result.text.strip()
                 break
 
-    if cpu:
+    if prodtype == 'CPU':
         chip = Soup.find('h1')
         extra = chip.text
     '''
@@ -98,8 +98,8 @@ def get_preisdaten(file_path, withchipset, withwattage, cpu):
     return [daten, extra]
 
 
-def filter_preisdaten(source_file, dest_file, GPU, PSU, cpu):
-    data = get_preisdaten(source_file, GPU, PSU, cpu)
+def filter_preisdaten(source_file, dest_file, prodtype):
+    data = get_preisdaten(source_file, prodtype)
     if data is not None:
         open(dest_file, 'w').write(json.dumps(data))
 
@@ -108,28 +108,29 @@ def filter_preisdaten(source_file, dest_file, GPU, PSU, cpu):
 # filtert die Dateien in einem bestimmten Bereich
 def mp_filtering(eingabe):
     files = sorted(os.listdir(eingabe[0]))
-    for i in eingabe[4]:
+    for i in eingabe[3]:
         if i < len(files):
             try:
-                filter_preisdaten(eingabe[0] + files[i], eingabe[1] + files[i].split('.')[0] + '.json', eingabe[2], eingabe[3], eingabe[-1])
-            except:
+                filter_preisdaten(eingabe[0] + files[i], eingabe[1] + files[i].split('.')[0] + '.json', eingabe[2])
+            except Exception as e:
+                print(e)
                 print(files[i])
                 try:
-                    open('neuFiltern/' + str(eingabe[5]), 'a').write(files[i] + '\n')
+                    open('neuFiltern/' + str(eingabe[4]), 'a').write(files[i] + '\n')
                 except FileNotFoundError:
-                    open('neuFiltern/' + str(eingabe[5]), 'w').write(files[i] + '\n')
+                    open('neuFiltern/' + str(eingabe[4]), 'w').write(files[i] + '\n')
 
 
 if __name__ == '__main__':
     p = Pool()
-    source = 'C:/Users/PC/Daten/daten/Code/BWKI/daten/Preisdaten/PSU/'
-    destination = 'neuFiltern/PSU/'
+    source = 'C:/Users/PC/Daten/daten/Code/BWKI/daten/Preisdaten/GPU/'
+    destination = 'neuFiltern/GPU/'
     NumberOfProcesses = 12
     Numbers = [[] for i in range(NumberOfProcesses)]  # die Indexe der Aufgaben für jeden Prozess
     for i in range(len(os.listdir(source))):
         Numbers[i % NumberOfProcesses].append(i)
 
-    data = [[source, destination, False, True, Numbers[i], i, False].copy() for i in range(NumberOfProcesses)]
+    data = [[source, destination, 'GPU', Numbers[i], i].copy() for i in range(NumberOfProcesses)]
     p.map(mp_filtering, data)
 
     p.close()

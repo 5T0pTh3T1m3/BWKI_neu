@@ -1,4 +1,5 @@
 import json
+import sys
 
 
 # skaliert alle Dateien, sodass sie zwischen 0 und 1 liegen
@@ -13,8 +14,12 @@ def scale_data(sourcefile, targetfile):
         buffer = [content[cat][zeit] for zeit in content[cat].keys() if content[cat][zeit] is not None]
         max_x = max(buffer)
         min_x = min(buffer)
-        m = 1/(max_x - min_x)  # Delta Y / Delta X
-        n = 1 - (m * max_x)
+        try:
+            m = 1/(max_x - min_x)  # Delta Y / Delta X
+            n = 1 - (m * max_x)
+        except ZeroDivisionError:  # maximum und minimum sind identisch -> einfach so skalieren, dass es dauerhaft 1 ist
+            m = 1
+            n = 1 - max_x
 
         # alle Preise skalieren
         for zeit in content[cat].keys():
@@ -22,8 +27,9 @@ def scale_data(sourcefile, targetfile):
                 content[cat][zeit] = (m * content[cat][zeit]) + n
 
         # Skalierung speichern
-        content[cat].update({'scale': {'info': 'm = max_x - min_x, n = 1 - (m * max_x)', 'max_x': max_x, 'min_x': min_x}})
+        content[cat].update({'scale': {'info': 'm = max_x - min_x, n = 1 - (m * max_x), x = (1-n)/m', 'max_x': max_x, 'min_x': min_x}})
     open(targetfile, 'w', encoding='UTF-8').write(json.dumps(content))
 
 
-scale_data('neuFiltern/Klassifiziert/PSU.json', 'Test.json')
+TYPE = 'PSU'
+scale_data(f'neuFiltern/Klassifiziert/{TYPE}.json', f'{TYPE}.json')

@@ -81,7 +81,10 @@ def cpus_klassifizieren(sourcepath, targetfile):
     categories = {}
     for file in os.listdir(sourcepath):
         productdata = json.loads(open(sourcepath + file, encoding='UTF-8').read())
-        categories.update({productdata[1]: productdata})
+        buffer = {}
+        for zeitpunkt in productdata[0].keys():
+            buffer.update({zeitpunkt: productdata[0][zeitpunkt][0]})
+        categories.update({productdata[1]: buffer})
     open(targetfile, 'w', encoding='UTF-8').write(json.dumps(categories))
 
 
@@ -91,18 +94,18 @@ def visualize_data(xaxis, yaxis):
     pyplot.show()
 
 
-PSU = True
+'''PSU = True
 if PSU:
     # 100 bis 1600 Watt sind möglich (16 * 100)
     for i in range(1, 17):
         CATEGORIES.update({i * 100: []})
         DATA.update({i * 100: {}})
-# path = 'test/'
 PATH = 'neuFiltern/PSU/'
 
-# open('not_a_file.json', 'w').write(json.dumps(sort_into_categories(PATH, '29hKHx.json', CATEGORIES, 'GPU')))
 for file in os.listdir(PATH):
     CATEGORIES = sort_into_categories(PATH, file, CATEGORIES, 'PSU')
 
 DATA = extract_data(CATEGORIES)
-open('neuFiltern/Klassifiziert/PSU.json', 'w', encoding='UTF-8').write(json.dumps(DATA))
+open('neuFiltern/Klassifiziert/PSU.json', 'w', encoding='UTF-8').write(json.dumps(DATA))'''
+
+cpus_klassifizieren('neuFiltern/CPU/', 'neuFiltern/Klassifiziert/CPU.json')
