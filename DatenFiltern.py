@@ -48,7 +48,7 @@ def get_preisdaten(file_path, withchipset, withwattage, cpu):
         chipset = Soup.find_all('h2')
         for result in chipset:
             if 'Chipset' in result.text:
-                extra = result.text.split(': ')[1]
+                extra = result.text.split(': ')[-1]
                 break
 
     if withwattage:
@@ -120,35 +120,16 @@ def mp_filtering(eingabe):
                     open('neuFiltern/' + str(eingabe[5]), 'w').write(files[i] + '\n')
 
 
-if False:
-    begin = time.time()
-    counter = 0
-    files = os.listdir('D:/Preisdaten/PSU/')
-    for counter in range(0, len(files)):
-        datei = files[counter]
-        if datei[0] == '.':
-            datei = datei[2:]
-        try:
-            filter_preisdaten('D:/Preisdaten/PSU/' + datei, 'D:/Gefiltert/PSU_neu/' + datei.split('.')[0] + '.json', False, True)
-        except:
-            print('-------------------------------------------------------\n', datei, '\n----------------------------------------')
-        if counter % 20 == 1:
-            print('Zeit pro Datei', (time.time()-begin)/counter)
-            print('geschätzte Prognose', ((time.time()-begin)/counter)*(len(os.listdir('D:/Preisdaten/PSU/'))-counter)/60)
-
-        print(time.time()-begin)
-
-
 if __name__ == '__main__':
     p = Pool()
-    source = 'C:/Users/PC/Daten/daten/Code/BWKI/daten/Preisdaten/CPU/'
-    destination = 'neuFiltern/CPU/'
+    source = 'C:/Users/PC/Daten/daten/Code/BWKI/daten/Preisdaten/PSU/'
+    destination = 'neuFiltern/PSU/'
     NumberOfProcesses = 12
     Numbers = [[] for i in range(NumberOfProcesses)]  # die Indexe der Aufgaben für jeden Prozess
     for i in range(len(os.listdir(source))):
         Numbers[i % NumberOfProcesses].append(i)
 
-    data = [[source, destination, False, False, Numbers[i], i, True].copy() for i in range(NumberOfProcesses)]
+    data = [[source, destination, False, True, Numbers[i], i, False].copy() for i in range(NumberOfProcesses)]
     p.map(mp_filtering, data)
 
     p.close()

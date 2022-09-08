@@ -63,18 +63,6 @@ def extract_data(categories):
                         list[zeitpunkt] = [preis, shop]
             '''
             for product in categories[cat]:
-                '''try:
-                    print(product[1][1])
-                    print(product)
-                    sys.exit()
-                except Exception as e:
-                    pass
-                if True and False:
-                    print(type(product[1]))
-                    print(len(product[1]))
-                    print(product[1][1])
-                    # print(type(product[1]))
-                    sys.exit()'''
                 for zeitpunkt in product[1][0].keys():
                     if zeitpunkt in preisverlauf.keys():  # Zeitpunkt ist bereits vorhanden
                         if preisverlauf[zeitpunkt] is None:  # war in dem Moment nicht verfügbar
@@ -88,6 +76,7 @@ def extract_data(categories):
     return data
 
 
+# einfach einmal mit den Parametern ausführen, enstehende Datei ist zu groß für GitHub
 def cpus_klassifizieren(sourcepath, targetfile):
     categories = {}
     for file in os.listdir(sourcepath):
@@ -102,7 +91,7 @@ def visualize_data(xaxis, yaxis):
     pyplot.show()
 
 
-'''PSU = True
+PSU = True
 if PSU:
     # 100 bis 1600 Watt sind möglich (16 * 100)
     for i in range(1, 17):
@@ -116,6 +105,4 @@ for file in os.listdir(PATH):
     CATEGORIES = sort_into_categories(PATH, file, CATEGORIES, 'PSU')
 
 DATA = extract_data(CATEGORIES)
-open('neuFiltern/Klassifiziert/PSU.json', 'w', encoding='UTF-8').write(json.dumps(DATA))'''
-
-cpus_klassifizieren('neuFiltern/CPU/', 'neuFiltern/Klassifiziert/CPU.json')
+open('neuFiltern/Klassifiziert/PSU.json', 'w', encoding='UTF-8').write(json.dumps(DATA))

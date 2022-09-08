@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import multiprocessing
 
 import requests
 from pprint import pprint
@@ -55,3 +56,8 @@ def format_crypto_course(source_path, source_file, dest_path, dest_file):
         if data[i + places['date']] != '' and data[i + places['close']] != '':
             formatted_data[1].update({format_timestamp(data[i + places['date']]): data[i + places['close']]})
     open(dest_path + dest_file, 'w', encoding='UTF-8').write(json.dumps(formatted_data))
+
+
+path = 'neuFiltern/PSU/'
+for file in os.listdir(path):
+    scale_data(path + file)
