@@ -19,7 +19,7 @@ def format_file(sourcefile):
     end = max(zeitpunkte)
     del zeitpunkte
 
-    for zeit in range((begin//86400000) * 86400000, (end//86400000) * 86400000, 864000000):
+    for zeit in range((begin//86400000) * 86400000, (end//86400000) * 86400000, 86400000):
         zeiten.append(zeit)
         preise.append([None for i in range(len(content.keys()))])  # alle Produkte auf N.A. setzen
 
@@ -29,10 +29,11 @@ def format_file(sourcefile):
     for product in content.keys():
         bezeichnungen.append(product)
         # gesamte Zeit durchgehen
-        for zeit in range((begin//86400000) * 86400000, (end//86400000) * 86400000, 864000000):
+        # for zeit in range((begin//86400000) * 86400000, (end//86400000) * 86400000, 86400000):
+        for zeit in zeiten:
             preis = None  # Preis von dem Produkt, zu dem Zeitpunkt
             # alle Preise innerhalb von dem Tag durchgehen (sehr ineffizient, weil auf Millisekunde genau, sollte aber gehen)
-            for zeit2 in range(zeit, zeit + 864000000, 100000):
+            for zeit2 in range(zeit, zeit + 86400000, 100000):
                 if str(zeit2) in content[product].keys():
                     if preis is None:
                         preis = content[product][str(zeit2)]
@@ -48,10 +49,12 @@ def format_file(sourcefile):
             sys.exit()
 
         done += 1
-        print(f'avg Secs. per Product: {(time.time() - start)/done}s')
-        print(f'Time Remaining: {(((time.time() - start)/done) * (remaining - done))/360}h')
-        print(f'{(done/remaining) * 100}% done...')
-        print(f'Script running since {time.time() - start}s now')
+        if done % 20 == 1:
+            print(f'avg Secs. per Product: {(time.time() - start)/done}s')
+            print(f'Time Remaining: {(((time.time() - start)/done) * (remaining - done))/60}min')
+            print(f'{(done/remaining) * 100}% done...')
+            print(f'Script running since {time.time() - start}s now')
+            print('------------------------------------------------')
     return {'names': bezeichnungen, 'zeiten': zeiten, 'preise': preise, 'scales': skalierungen}
 
 
