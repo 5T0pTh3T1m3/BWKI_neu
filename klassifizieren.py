@@ -100,12 +100,12 @@ if PSU:
     for i in range(1, 17):
         CATEGORIES.update({i * 100: []})
         DATA.update({i * 100: {}})
-PATH = 'neuFiltern/PSU/'
+PATH = 'neuFiltern/GPU/'
 
 for file in os.listdir(PATH):
-    CATEGORIES = sort_into_categories(PATH, file, CATEGORIES, 'PSU')
+    CATEGORIES = sort_into_categories(PATH, file, CATEGORIES, 'GPU')
 
 DATA = extract_data(CATEGORIES)
-open('neuFiltern/Klassifiziert/PSU.json', 'w', encoding='UTF-8').write(json.dumps(DATA))'''
+open('fertigeDateien/GPU.json', 'w', encoding='UTF-8').write(json.dumps(DATA))'''
 
-cpus_klassifizieren('neuFiltern/CPU/', 'neuFiltern/Klassifiziert/CPU.json')
+cpus_klassifizieren('neuFiltern/CPU/', 'fertigeDateien/CPU.json')

@@ -1,3 +1,8 @@
-File:
-dict[product]:
-	dict[zeitpunkt] = preis
+file[product] = {
+    zeit: skalierter_preis,
+    scale:{
+        info: m = max_x - min_x, n = 1 - (m * max_x), x = (1-n)/m,
+        max_x: int,
+        min_x: int
+    }
+}
