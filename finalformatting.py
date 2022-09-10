@@ -33,7 +33,7 @@ def format_file(sourcefile):
         for zeit in zeiten:
             preis = None  # Preis von dem Produkt, zu dem Zeitpunkt
             # alle Preise innerhalb von dem Tag durchgehen (sehr ineffizient, weil auf Millisekunde genau, sollte aber gehen)
-            for zeit2 in range(zeit, zeit + 86400000, 100000):
+            for zeit2 in zeiten:
                 if str(zeit2) in content[product].keys():
                     if preis is None:
                         preis = content[product][str(zeit2)]
@@ -41,6 +41,8 @@ def format_file(sourcefile):
                         if content[product][str(zeit2)] < preis:
                             preis = content[product][str(zeit2)]
 
+            if preis is None:
+                preis = 0
             preise[zeiten.index(zeit)][bezeichnungen.index(product)] = preis
         try:
             skalierungen.append(content[product]['scale'])
