@@ -16,7 +16,7 @@ def scale_data(sourcefile, targetfile):
             max_x = max(buffer)
             min_x = min(buffer)
             try:
-                m = 1/(max_x - min_x)  # Delta Y / Delta X
+                m = 0.9999/(max_x - min_x)  # Delta Y / Delta X (minimaler Wert für Y > 0, 0 heißt Produkt N.A.)
                 n = 1 - (m * max_x)
             except ZeroDivisionError:  # maximum und minimum sind identisch -> einfach so skalieren, dass es dauerhaft 1 ist
                 m = 1

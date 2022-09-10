@@ -1,3 +1,1 @@
-import tensorflow as tf
-
-print(tf.version)
+print(int(False))

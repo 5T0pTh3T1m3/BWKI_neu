@@ -33,7 +33,7 @@ def format_file(sourcefile):
         for zeit in zeiten:
             preis = None  # Preis von dem Produkt, zu dem Zeitpunkt
             # alle Preise innerhalb von dem Tag durchgehen (sehr ineffizient, weil auf Millisekunde genau, sollte aber gehen)
-            for zeit2 in zeiten:
+            for zeit2 in range(zeit, zeit + 86400000, 10000):
                 if str(zeit2) in content[product].keys():
                     if preis is None:
                         preis = content[product][str(zeit2)]
@@ -61,3 +61,4 @@ def format_file(sourcefile):
 
 
 open('FINISHED.json', 'w').write(json.dumps(format_file('ALLES.json')))
+# open('test.json', 'w').write(json.dumps(format_file('konstantePreise.json')))
