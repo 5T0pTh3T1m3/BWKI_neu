@@ -1,3 +1,4 @@
+# passt Daten von YahooFinance an die Struktur der restlichen Daten an
 import datetime
 import json
 import os
