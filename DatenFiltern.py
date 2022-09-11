@@ -1,3 +1,5 @@
+# für Datensatz erstellen als 1. ausführen
+# formatiert alle einzelnen Dateien so, dass nur noch die nötigen Information in diesen vorhanden sind
 import json
 import os
 import sys

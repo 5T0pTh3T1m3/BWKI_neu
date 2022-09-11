@@ -1,3 +1,5 @@
+# für Datensatz erstellen als 2. ausführen
+# alle Produkte einer Kategorie werden zusammengefasst (alle 3070, 500W Netzteil, etc.)
 import sys
 from matplotlib import pyplot
 import os

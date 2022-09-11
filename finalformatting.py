@@ -1,3 +1,5 @@
+# für Datensatz erstellen als 5. ausführen
+# führt die Preiskurven von den verschiedenen Produkten zu einem Array mit allen Preiskurven zusammen
 import json
 import sys
 import time

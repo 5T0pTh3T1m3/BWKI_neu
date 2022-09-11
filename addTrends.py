@@ -1,3 +1,5 @@
+# für Datensatz erstellen als 6. ausführen
+# formatiert den kompletten Datensatz erneut -> jetzt sind Trends darin gespeichert
 '''
 neue Dateistruktur für die Preise:
 names[i] = 'ein Produktname',
@@ -50,7 +52,7 @@ def format_file(file, trenddauer):
         # wird später einfach in den Trend für den jeweiligen Preis eingesetzt
         trend = []
         for j in range(len(content['names'])):  # durch alle Produkte durchgehen, Trend für jeweiliges Produkt berechnen
-            trend.append(int(avg([content['preise'][k][j] for k in range(i, i + trenddauer)]) <= content['preise'][i][j]))
+            trend.append(avg([content['preise'][k][j] for k in range(i, i + trenddauer)]) <= content['preise'][i][j])
         trends.append(trend)
 
     content['preise'] = preise_neu
@@ -59,6 +61,7 @@ def format_file(file, trenddauer):
     return content
 
 
-TRENDDAUER = 200
-neu = format_file('FINISHED.json', TRENDDAUER)
-open(f'DatenMitTrendsDrin/{TRENDDAUER}.json', 'w').write(json.dumps(neu))
+stuff = [20, 50, 100]
+for TRENDDAUER in stuff:
+    neu = format_file('FINISHED.json', TRENDDAUER)
+    open(f'DatenMitTrendsDrin/{TRENDDAUER}.json', 'w').write(json.dumps(neu))

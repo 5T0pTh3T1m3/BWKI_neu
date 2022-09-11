@@ -1,11 +1,11 @@
+# für Datensatz erstellen als 3. ausführen
+# nimmt mehrere Dateien in vorherigem Format (CPU/GPU/... getrennt) -> fügt alle zu einer Datei zusammen
+import os
+import sys
 import json
 
 
-# fügt zu Bigfile die Produkte in SmallFile Hinzu
-import os
-import sys
-
-
+# fügt zu Bigfile die Produkte in SmallFile hinzu
 def add_to_file(bigcontent, smallcontent, variante):
     '''
     bigcontent[product] = {

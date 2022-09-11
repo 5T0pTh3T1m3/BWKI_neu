@@ -1,9 +1,11 @@
+# für Datensatz erstellen als 4. ausführen
+# skaliert alle Preise, sodass sie zwischen 0 und 1 liegen
 import json
 import sys
 
 
 # skaliert alle Dateien, sodass sie zwischen 0 und 1 liegen
-# -> es wird eine lineare Funktion erstellt, durch welche das Minimum bei 0 und das Maximum bei 1 ist
+# -> es wird eine lineare Funktion erstellt, durch welche das Minimum >0 und das Maximum bei 1 ist
 # in der Datei für ein Produkt, wird jeweils die Skalierung gespeichert
 # als INPUT wird eine komplette Datei genommen, die bereits fertig klassifiziert wurde
 def scale_data(sourcefile, targetfile):
@@ -28,7 +30,7 @@ def scale_data(sourcefile, targetfile):
                     content[cat][zeit] = (m * float(content[cat][zeit])) + n
 
             # Skalierung speichern
-            content[cat].update({'scale': {'info': 'm = max_x - min_x, n = 1 - (m * max_x), x = (1-n)/m', 'max_x': max_x, 'min_x': min_x}})
+            content[cat].update({'scale': {'info': 'm = 0.9999/(max_x - min_x), n = 1 - (m * max_x), x = (y-n)/m', 'max_x': max_x, 'min_x': min_x}})
     open(targetfile, 'w', encoding='UTF-8').write(json.dumps(content))
 
 
