@@ -1765,3 +1765,6 @@ neuFiltern/CPU
 neuFiltern/GPU
 neuFiltern/PSU
 ALLES.json
+DatenMitTrendsDrin/100.json
+DatenMitTrendsDrin/20.json
+DatenMitTrendsDrin/50.json
